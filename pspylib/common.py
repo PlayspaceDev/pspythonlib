@@ -471,7 +471,7 @@ def write_to_file(text, file_path):
 
 def read_from_file(file_path):
     with open(file_path, "r") as f:
-        return r.read()
+        return f.read()
 
 def to_unix_path(path):
     return os.path.normpath(path).replace(os.sep, "/")
