@@ -74,7 +74,7 @@ class UpgradeTool(ITool):
         pwd = os.getcwd()
         try:
             os.chdir(tmpdir)
-            if execute_cmd(["python" if is_windows() else "python3", "setup.py", "install", "--user" if  args.user else ""]).rc != 0:
+            if execute_cmd(["python" if is_windows() else "python3", "setup.py", "install", "--user" if args.user else "--nouser"]).rc != 0:
                 die("Upgrade failed! Check the log for more info...")
             log_info("All upgraded to the latest version! Remember to reload any running scripts xD")
         finally:
