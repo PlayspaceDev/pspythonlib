@@ -64,6 +64,7 @@ class UpgradeTool(ITool):
     def __init__(self, parser, tmpdir):
         global tool_origin
         parser.add_argument('-o', '--origin', help='The git origin, by default poiniting to our base git', type=str, default=tool_origin, required=False)
+        parser.add_argument('--user', action='store_true', default=False, help='Install pstool into the user environment', required=False)
 
     def execute(self, args, tmpdir):
         if is_windows():
@@ -72,8 +73,8 @@ class UpgradeTool(ITool):
         execute_cmd(["git", "clone", "--depth=1", args.origin, tmpdir])
         pwd = os.getcwd()
         try:
-            os.chdir(clone_path)
-            if execute_cmd(["python" if is_windows() else "python3", "setup.py", "install"]).rc != 0:
+            os.chdir(tmpdir)
+            if execute_cmd(["python" if is_windows() else "python3", "setup.py", "install"] + ["--user"] if args.user else []).rc != 0:
                 die("Upgrade failed! Check the log for more info...")
             log_info("All upgraded to the latest version! Remember to reload any running scripts xD")
         finally:
