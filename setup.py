@@ -13,6 +13,7 @@ class install(_install):
         # Autocompletion for unix environments
         if not sys.platform.startswith('win'):            
             subprocess.run(["activate-global-python-argcomplete"], check=True)
+        _install.do_egg_install(self)
 
 setup(
         name="pspylib",
