@@ -10,9 +10,6 @@ import sys
 class install(_install):
     def run(self):
         subprocess.run(["pip3", "install", "-r", "requirements", "--upgrade"], check=True)
-        # Autocompletion for unix environments
-        if not sys.platform.startswith('win'):            
-            subprocess.run(["activate-global-python-argcomplete"], check=True)
         _install.do_egg_install(self)
 
 setup(
