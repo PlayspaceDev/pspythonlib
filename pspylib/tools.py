@@ -3,6 +3,7 @@
 # Copyright (C) 2018 - Playspace
 import inspect
 import argparse
+import argcomplete
 import sys
 import tempfile
 import os
@@ -104,6 +105,7 @@ def main_tool(argv=None, description=__description__, version=__version__, copyr
         subparser = parser.add_subparsers(dest='tool', help='Available tools')
         subparser.required = True
         init_tools(subparser, tmpdir)
+        argcomplete.autocomplete(parser)
 
         if '--interactive' in argv:
             log_info("Welcome to the interactive console. Type 'q' or 'quit' to exit the console.")
