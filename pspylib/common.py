@@ -255,20 +255,20 @@ def git_clean_repo(repo):
         except Exception as e:
             log_info(" Couldn't clean the branch in local. Error:\n{}", e)
 
-def git_merge_repo(repo, action, squash, source, destination):
+def git_merge_repo(repo, action, squash, source, destination, message=None):
     source_branch = "origin/{}".format(source)
     git_checkout_tracked(repo, destination)
     repo.git.pull('--no-edit', 'origin', destination)
     try:
         if not squash:
-            repo.git.merge(source_branch, '--no-ff', '-m', 'Merge {} {} into {}'.format(action, source, destination))
+            repo.git.merge(source_branch, '--no-ff', '-m', 'Merge {} {} into {}{}'.format(action, source, destination, ", {}".format(message) if message else ""))
         else:
             repo.git.merge(source_branch, '--squash')
             try:
                 repo.git.commit('--no-edit')
             except:
                 pass
-            repo.git.merge(source_branch, '-m', 'Merge {} {} into {}'.format(action, source, destination))
+            repo.git.merge(source_branch, '-m', 'Merge {} {} into {}{}'.format(action, source, destination, ", {}".format(message) if message else ""))
     except Exception as e:
         die(" Couldn't finish merge, resolve conflict and try again. Error:\n{}", e)
 
