@@ -68,9 +68,6 @@ class UpgradeTool(ITool):
         parser.add_argument('--user', action='store_true', default=False, help='Install pstool into the user environment', required=False)
 
     def execute(self, args, tmpdir):
-        if is_windows():
-            die("No hot upgrade for windows folks. Install it from a cloned repo.")
-
         execute_cmd(["git", "clone", "--depth=1", args.origin, tmpdir])
         pwd = os.getcwd()
         try:
@@ -79,8 +76,12 @@ class UpgradeTool(ITool):
                 print("Installing for current user")
             else:
                 print("Installing system wide")
-            if execute_cmd(["python" if is_windows() else "python3", "setup.py", "install"] + (["--user"] if args.user else [])).rc != 0:
-                die("Upgrade failed! Check the log for more info...")
+
+            if is_windows():
+                execute_cmd(["python", "setup.py", "install"] + (["--user"] if args.user else []), detached=True)
+            else:
+                if execute_cmd(["python3", "setup.py", "install"] + (["--user"] if args.user else [])).rc != 0:
+                    die("Upgrade failed! Check the log for more info...")
             log_info("All upgraded to the latest version! Remember to reload any running scripts xD")
         finally:
             os.chdir(pwd)

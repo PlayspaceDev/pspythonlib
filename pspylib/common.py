@@ -533,12 +533,16 @@ class ProcessOutput(object):
     def raw(self):
         return self.__dict__
 
-def execute_cmd(command_args, env=None, cwd=None, capture_output=False, encoding='utf8'):
+def execute_cmd(command_args, env=None, cwd=None, capture_output=False, encoding='utf8', detached=False):
     command = join_args(command_args)
     log_info("Executing command {start}{command}{end} in {start}{cwd}{end}", start=bcolors.OKGREEN, command=command, end=bcolors.ENDC, cwd=(cwd if cwd else os.getcwd()))
     p = None
     try:
-        p = subprocess.Popen(command, shell=True, env=env, cwd=cwd, stdout=subprocess.PIPE if capture_output else None, stderr=subprocess.PIPE if capture_output else None)
+        if is_windows() and detached:
+            DETACHED_PROCESS = 0x00000008
+            p = subprocess.Popen(command, shell=True, env=env, cwd=cwd, stdout=subprocess.PIPE if capture_output else None, stderr=subprocess.PIPE if capture_output else None, creationflags=DETACHED_PROCESS)
+        else:
+            p = subprocess.Popen(command, shell=True, env=env, cwd=cwd, stdout=subprocess.PIPE if capture_output else None, stderr=subprocess.PIPE if capture_output else None)
         stdout, stderr = p.communicate()
         return ProcessOutput({
             'args':   p.args,
@@ -551,14 +555,14 @@ def execute_cmd(command_args, env=None, cwd=None, capture_output=False, encoding
         raise e
 
 @ignore_exception(default_value=None, silent=False)
-def execute_cmd_safe(command_args, env=None, cwd=None, capture_output=False, encoding='utf8'):
+def execute_cmd_safe(command_args, env=None, cwd=None, capture_output=False, encoding='utf8', detached=False):
     return execute_cmd(command_args, env, cwd, capture_output)
 
-def execute_script(command_args, cwd=None):
+def execute_script(command_args, cwd=None, detached=False):
     if is_windows():
-        return execute_cmd(["call"] + command_args, cwd=cwd) 
+        return execute_cmd(["call"] + command_args, cwd=cwd, detached=detached) 
     else:
-        return execute_cmd(command_args, cwd=cwd) 
+        return execute_cmd(command_args, cwd=cwd, detached=detached) 
 
 @ignore_exception(default_value=None, silent=False)
 def execute_script_safe(command_args, cwd=None):
