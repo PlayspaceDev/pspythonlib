@@ -242,6 +242,16 @@ def get_config_checked(config_dict, key, type, validator, default_value=None):
 # Git helpers
 # ----------------------------------------------------------------------------------------
 
+def gather_repos(root_path):
+    repos = []
+    for dirname, dirnames, filenames in os.walk(root_path):
+        for int_dir in dirnames:                
+            if '.git' in int_dir and not 'node_modules' in int_dir:
+                abspath = os.path.abspath(dirname)
+                repo = Repo(abspath)
+                repos.append(repo)
+    return repos
+
 def git_clean(repo, flags='-fd'):
     try:
         repo.git.clean(flags)
