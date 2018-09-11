@@ -713,7 +713,11 @@ def input_str(prompt, default=""):
 
 class PackageInfo(object):
     def __init__(self, packageName):
-        pkgInfo = message_from_string(pkg_resources.get_distribution(packageName).get_metadata('PKG-INFO'))
+        try:
+            pkgInfo = message_from_string(pkg_resources.get_distribution(packageName).get_metadata('METADATA'))
+        except:
+            pkgInfo = message_from_string(pkg_resources.get_distribution(packageName).get_metadata('PKG-INFO'))
+
         for item in pkgInfo.items():
             if item[0] == "Version":
                 self.version = item[1]
