@@ -3,6 +3,12 @@
 Small library containing reusable functions and code. The main part is a simple yet effective
 tooling framework to create command line interface apps.
 
+## Install
+
+````bash
+$ pip install --process-dependency-links -e git+ssh://git@gitlab.playspace.com/tools/pspythonlib.git@master#egg=pspylib
+````
+
 ## License
 
 MIT License
