@@ -6,7 +6,7 @@ import sys
 from pspylib.tools import main_tool
 from pspylib.common import PackageInfo
 
-__origin__ = "git@gitlab.playspace.com:tools/pspythoncli.git"
+__origin__ = "git@gitlab.playspace.com:tools/pspythonlib.git"
 
 
 def main():
