@@ -2,25 +2,25 @@
 # -*- coding: utf-8 -*-
 # Copyright (C) 2018 - Playspace
 
-from setuptools.command.install import install as _install
 from setuptools import setup, find_packages
-import subprocess
-import sys
-import distutils.command.install as orig
 
-class install(_install):
-    def run(self):
-        subprocess.run(["pip3", "install", "-r", "requirements", "--upgrade"], check=True)
-        #_install.do_egg_install(self)
-        orig.install.run(self)
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+with open("requirements.txt", "r") as fh:
+    install_requires = fh.readlines()
 
 setup(
-        name="pspylib",
-        version="0.0.1",
-        description="Playspace shared python library",
-        author="Playspace Dev Team",
-        packages=find_packages(),
-        cmdclass={
-            'install': install
-        }
+    name="pspylib",
+    version="0.0.2",
+    description="Playspace shared python library",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    author="Playspace Dev Team",
+    author_email="developers@playspace.com",
+    packages=find_packages(),
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "Operating System :: OS Independent",
+    ],
+    install_requires=install_requires,
 )
