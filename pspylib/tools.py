@@ -89,14 +89,12 @@ class UpgradeTool(ITool):
             else:
                 print("Installing system wide")
 
+            pip_args = ['install', '.', '--process-dependency-links'] + (["--user"] if args.user else [])
             if hasattr(pip, 'main'):
-                result_code = pip.main(['install', '.'] + (["--user"] if args.user else []))
+                result_code = pip.main(pip_args)
             else:
                 from pip import _internal
-                result_code = pip._internal.main(['install', '.'] + (["--user"] if args.user else []))
-
-            # if is_windows():
-            #     execute_cmd(["python", "setup.py", "install"] + (["--user"] if args.user else []), detached=True)
+                result_code = pip._internal.main(pip_args)
 
             if result_code != 0:
                 die("Upgrade failed! Check the log for more info...")
