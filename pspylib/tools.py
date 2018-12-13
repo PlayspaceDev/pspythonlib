@@ -102,6 +102,7 @@ class UpgradeTool(ITool):
             log_info("All upgraded to the latest version! Remember to reload any running scripts xD")
         finally:
             os.chdir(pwd)
+            purge_dir(install_dir)
 
 
 def main_tool(argv=None, description=__description__, version=__version__, copyright=__copyright__, author=__author__,
