@@ -17,6 +17,8 @@ from distutils.version import StrictVersion
 from git import Repo, Head
 import pkg_resources
 from email import message_from_string
+from colorama import init, Fore, Style
+init()
 
 try:
     import readline
@@ -82,30 +84,22 @@ def xstr(s):
 
 
 def print_safe(text):
-    try:
-        utf_bytes = text.encode('utf8')
-    except:
-        utf_bytes = text
-    sys.stdout.buffer.write(utf_bytes)
-    sys.stdout.write('\n')
-    sys.stdout.flush()
-
+    print(text)
 
 def log_info(text, *args, **kwargs):
     print_safe(xstr(text).format(*args, **kwargs))
 
-
 def log_debug(text, *args, **kwargs):
-    print_safe(bcolors.LIGHTBLUE + xstr(text).format(*args, **kwargs) + bcolors.ENDC)
-
+    print_safe(Fore.BLUE + xstr(text).format(*args, **kwargs))
+    print(Style.RESET_ALL)
 
 def log_warn(text, *args, **kwargs):
-    print_safe(bcolors.WARNING + xstr(text).format(*args, **kwargs) + bcolors.ENDC)
-
+    print_safe(Fore.YELLOW + xstr(text).format(*args, **kwargs))
+    print(Style.RESET_ALL)
 
 def log_error(text, *args, **kwargs):
-    print_safe(bcolors.FAIL + xstr(text).format(*args, **kwargs) + bcolors.ENDC)
-
+    print_safe(Fore.RED + xstr(text).format(*args, **kwargs))
+    print(Style.RESET_ALL)
 
 def die(text, *args, **kwargs):
     log_error(text, *args, **kwargs)
