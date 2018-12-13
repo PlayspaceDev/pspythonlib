@@ -4,6 +4,7 @@
 import inspect
 import argcomplete
 import tempfile
+import subprocess
 from pspylib.common import *
 
 __version__ = "1.0.0"
@@ -85,24 +86,44 @@ class UpgradeTool(ITool):
         try:
             os.chdir(install_dir)
             if args.user:
-                print("Installing for current user")
+                log_debug("Installing for current user")
             else:
-                print("Installing system wide")
-
-            pip_args = ['install', '.', '--process-dependency-links'] + (["--user"] if args.user else [])
-            if hasattr(pip, 'main'):
-                result_code = pip.main(pip_args)
-            else:
-                from pip import _internal
-                result_code = pip._internal.main(pip_args)
-
-            if result_code != 0:
-                die("Upgrade failed! Check the log for more info...")
-
-            log_info("All upgraded to the latest version! Remember to reload any running scripts xD")
+                log_debug("Installing system wide")
+                
+            f = open("_install.py","w+")
+            f.write("\n".join(
+                [ 'from time import sleep'
+                , 'import pip, sys, shutil, stat, os'
+                , 'from colorama import init, Fore, Style'
+                , 'init(autoreset=True)'
+                , 'def purge_dir(dir_path):'
+                , '    if os.path.isdir(dir_path):'
+                , '        def del_evenReadonly(action, name, exc):'
+                , '            os.chmod(name, stat.S_IWRITE)'
+                , '            os.remove(name)'
+                , '        shutil.rmtree(dir_path, onerror=del_evenReadonly)'
+                , 'sleep(1)'
+                , 'pwd = os.getcwd()'
+                , 'try:'
+                , '    pip_args = ["install", ".", "--process-dependency-links"]' + (' + ["--user"]' if user else '')
+                , '    if hasattr(pip, "main"):'
+                , '        result_code = pip.main(pip_args)'
+                , '    else:'
+                , '        from pip import _internal'
+                , '        result_code = pip._internal.main(pip_args)'
+                , '    if result_code != 0:'
+                , '        print(Fore.RED + "Upgrade failed! Check the log for more info...", file=sys.stderr)'
+                , '    else:'
+                , '        print(Fore.GREEN + "Upgrade successful! Enjoy!")'
+                , 'finally:'
+                , '    os.chdir("..")'
+                , '    purge_dir(pwd)']))
+            f.close()
+            p = subprocess.Popen(['python', '_install.py'])
+            log_debug("Install process started, please wait for it to finish!")
         finally:
             os.chdir(pwd)
-            purge_dir(install_dir)
+            #purge_dir(install_dir)
 
 
 def main_tool(argv=None, description=__description__, version=__version__, copyright=__copyright__, author=__author__,
