@@ -1,3 +1,4 @@
 argcomplete
 psutil
 gitpython
+colorama
