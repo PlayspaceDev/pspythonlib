@@ -77,13 +77,13 @@ class UpgradeTool(ITool):
                             help='Install pstool into the user environment', required=False)
 
     def execute(self, args, tmpdir):
-
         import pip
 
-        execute_cmd(["git", "clone", "--depth=1", args.origin, tmpdir])
+        install_dir = tempfile.mkdtemp()
+        execute_cmd(["git", "clone", "--depth=1", args.origin, install_dir])
         pwd = os.getcwd()
         try:
-            os.chdir(tmpdir)
+            os.chdir(install_dir)
             if args.user:
                 print("Installing for current user")
             else:
