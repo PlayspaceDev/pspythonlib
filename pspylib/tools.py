@@ -105,7 +105,7 @@ class UpgradeTool(ITool):
                 , 'sleep(1)'
                 , 'pwd = os.getcwd()'
                 , 'try:'
-                , '    pip_args = ["install", ".", "--process-dependency-links"]' + (' + ["--user"]' if user else '')
+                , '    pip_args = ["install", ".", "--process-dependency-links"]' + (' + ["--user"]' if args.user else '')
                 , '    if hasattr(pip, "main"):'
                 , '        result_code = pip.main(pip_args)'
                 , '    else:'
