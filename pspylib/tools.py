@@ -164,7 +164,7 @@ def main_tool(argv=None, description=__description__, version=__version__, copyr
                         break
 
                     try:
-                        args = parser.parse_args(command.split() + ['--interactive'])
+                        args = parser.parse_args(command.split())
                         execute_tool(args.tool, args, tmpdir)
                     except SystemExit:
                         continue
