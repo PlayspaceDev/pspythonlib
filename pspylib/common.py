@@ -624,8 +624,8 @@ class ProcessOutput(object):
         return self.__dict__
 
 
-def execute_cmd(command_args, env=None, cwd=None, capture_output=False, encoding='utf8', detached=False):
-    command = join_args(command_args)
+def execute_cmd(original_command, env=None, cwd=None, capture_output=False, encoding='utf8', detached=False):
+    command = original_command if isinstance(original_command, str) else join_args(original_command)
     log_info("Executing command {start}{command}{end} in {start}{cwd}{end}", start=bcolors.OKGREEN, command=command,
              end=bcolors.ENDC, cwd=(cwd if cwd else os.getcwd()))
     p = None
