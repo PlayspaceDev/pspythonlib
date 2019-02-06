@@ -93,7 +93,7 @@ class UpgradeTool(ITool):
             f = open("_install.py","w+")
             f.write("\n".join(
                 [ 'from time import sleep'
-                , 'import pip, sys, shutil, stat, os'
+                , 'import shutil, stat, os, subprocess, sys'
                 , 'from colorama import init, Fore, Style'
                 , 'init(autoreset=True)'
                 , 'def purge_dir(dir_path):'
@@ -105,25 +105,19 @@ class UpgradeTool(ITool):
                 , 'sleep(1)'
                 , 'pwd = os.getcwd()'
                 , 'try:'
-                , '    pip_args = ["install", ".", "--process-dependency-links"]' + (' + ["--user"]' if args.user else '')
-                , '    if hasattr(pip, "main"):'
-                , '        result_code = pip.main(pip_args)'
-                , '    else:'
-                , '        from pip import _internal'
-                , '        result_code = pip._internal.main(pip_args)'
-                , '    if result_code != 0:'
-                , '        print(Fore.RED + "Upgrade failed! Check the log for more info...", file=sys.stderr)'
-                , '    else:'
-                , '        print(Fore.GREEN + "Upgrade successful! Enjoy!")'
+                , '    install_args = ["python3" if shutil.which("python3") else "python", "setup.py", "install"]' + (' + ["--user"]' if args.user else '')
+                , '    subprocess.check_call(install_args)'
+                , '    print(Fore.GREEN + "Upgrade successful! Enjoy!")'
+                , 'except Exception as err:'
+                , '    print(Fore.RED + "Upgrade failed! Check the log for more info..." + err, file=sys.stderr)'
                 , 'finally:'
                 , '    os.chdir("..")'
                 , '    purge_dir(pwd)']))
             f.close()
             p = subprocess.Popen(['python', '_install.py'])
-            log_debug("Install process started, please wait for it to finish!")
+            log_warn("Install process started, please wait for it to finish!")
         finally:
             os.chdir(pwd)
-            #purge_dir(install_dir)
 
 
 def main_tool(argv=None, description=__description__, version=__version__, copyright=__copyright__, author=__author__,
