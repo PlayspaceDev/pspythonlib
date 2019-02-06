@@ -105,7 +105,7 @@ class UpgradeTool(ITool):
                 , 'sleep(1)'
                 , 'pwd = os.getcwd()'
                 , 'try:'
-                , '    install_args = ["python3" if shutil.which("python3") else "python", "setup.py", "install"] + (["--user"] if args.user else [])'
+                , '    install_args = ["python3" if shutil.which("python3") else "python", "setup.py", "install"]' + (' + ["--user"]' if args.user else '')
                 , '    subprocess.check_call(install_args)'
                 , '    print(Fore.GREEN + "Upgrade successful! Enjoy!")'
                 , 'except Exception as err:'
