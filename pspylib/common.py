@@ -111,7 +111,7 @@ def die(text, *args, **kwargs):
 # ----------------------------------------------------------------------------------------
 
 def to_bool(value):
-    return str(value).lower() in ['true', '1', 't', 'y', 'yes', 'yeah', 'yup', 'certainly', 'uh-huh', 'aye']
+    return str(value).lower() in ['true', '1', 't', 'y', 'yes', 'yeah', 'yup', 'yep', 'certainly', 'uh-huh', 'aye', 'si', 'sep', 'ja', 'da']
 
 
 def get_uuid():
