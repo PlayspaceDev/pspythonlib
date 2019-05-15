@@ -624,10 +624,11 @@ class ProcessOutput(object):
         return self.__dict__
 
 
-def execute_cmd(original_command, env=None, cwd=None, capture_output=False, encoding='utf8', detached=False):
+def execute_cmd(original_command, env=None, cwd=None, capture_output=False, encoding='utf8', detached=False, silent=False):
     command = original_command if isinstance(original_command, str) else join_args(original_command)
-    log_info("Executing command {start}{command}{end} in {start}{cwd}{end}", start=bcolors.OKGREEN, command=command,
-             end=bcolors.ENDC, cwd=(cwd if cwd else os.getcwd()))
+    if not silent:
+        log_info("Executing command {start}{command}{end} in {start}{cwd}{end}", start=bcolors.OKGREEN, command=command,
+                 end=bcolors.ENDC, cwd=(cwd if cwd else os.getcwd()))
     p = None
     try:
         if is_windows() and detached:
@@ -650,6 +651,8 @@ def execute_cmd(original_command, env=None, cwd=None, capture_output=False, enco
         kill_process(p)
         raise e
 
+def execute_cmd_parallel(comand_tuple):
+    return execute_cmd(comand_tuple[0], cwd=comand_tuple[1], capture_output=True, silent=True)
 
 @ignore_exception(default_value=None, silent=False)
 def execute_cmd_safe(command_args, env=None, cwd=None, capture_output=False, encoding='utf8', detached=False):
