@@ -11,7 +11,7 @@ with open("requirements.txt", "r") as fh:
 
 setup(
     name="pspylib",
-    version="0.0.3",
+    version="0.0.4",
     description="Playspace shared python library",
     long_description=long_description,
     long_description_content_type="text/markdown",
