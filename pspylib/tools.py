@@ -5,11 +5,13 @@ import inspect
 import argcomplete
 import tempfile
 import subprocess
+from setuptools import find_packages
+
 from pspylib.common import *
 
 __version__ = "1.0.0"
 __author__ = "Playspace Dev Team"
-__copyright__ = "Playspace SL - 2018"
+__copyright__ = "Playspace SL - 2019"
 __description__ = "Flexible CLI tool - v{version} {copyright}"
 
 registered_tools = {}
@@ -31,8 +33,17 @@ def get_available_tools():
     global registered_tools
     return list(registered_tools.keys())
 
+def find_tools():
+    packages = find_packages()
+    for package in packages:
+        try:
+            __import__(package + ".tool")
+        except ModuleNotFoundError:
+            # Not a tool
+            pass
 
 def init_tools(parser, tmpdir):
+    find_tools()
     for tool_name in registered_tools:
         tool_parser = parser.add_parser(tool_name, help=registered_tools[tool_name]['help'])
         try:
@@ -119,7 +130,6 @@ class UpgradeTool(ITool):
         finally:
             os.chdir(pwd)
 
-
 def main_tool(argv=None, description=__description__, version=__version__, copyright=__copyright__, author=__author__,
               origin=None):
     global tool_origin
@@ -139,6 +149,8 @@ def main_tool(argv=None, description=__description__, version=__version__, copyr
                         help='Running in force mode will force the action to start in any case', required=False)
     parser.add_argument('--interactive', action='store_true', default=False,
                         help='Running the CLI in interactive mode', required=False)
+    parser.add_argument('--gui', action='store_true', default=False,
+                        help='Run the tool with a nice and simple UI', required=False)
 
     # Generate a temporal directory for the whole thing
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -150,11 +162,11 @@ def main_tool(argv=None, description=__description__, version=__version__, copyr
             argcomplete.autocomplete(parser)
 
             if '--interactive' in argv:
-                log_info("Welcome to the interactive console. Type 'q' or 'quit' to exit the console.")
+                log_info("Welcome to the interactive console. Type 'q', 'quit' or 'exit' to exit the console.")
                 while True:
 
                     command = input_str('$').lower()
-                    if command == 'q' or command == 'quit':
+                    if command == 'q' or command == 'quit' or command == 'exit':
                         break
 
                     try:
@@ -164,6 +176,8 @@ def main_tool(argv=None, description=__description__, version=__version__, copyr
                         continue
 
                 return EXIT_CODE_SUCCESS
+            elif '--gui' in argv:
+                log_error("Not yet pal implemented")
             else:
                 args = parser.parse_args(argv)
                 return execute_tool(args.tool, args, tmpdir)

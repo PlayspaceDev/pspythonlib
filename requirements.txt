@@ -1,4 +1,0 @@
-argcomplete
-psutil
-gitpython
-colorama
