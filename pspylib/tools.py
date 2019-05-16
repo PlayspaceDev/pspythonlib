@@ -78,58 +78,6 @@ def register_tool(name=None, help=None):
 
     return toolify
 
-
-@register_tool("upgrade", "Download the latest version of the tool and install it")
-class UpgradeTool(ITool):
-    def __init__(self, parser, tmpdir):
-        global tool_origin
-        parser.add_argument('-o', '--origin', help='The git origin, by default pointing to our base git', type=str,
-                            default=tool_origin, required=False)
-        parser.add_argument('--user', action='store_true', default=False,
-                            help='Install pstool into the user environment', required=False)
-
-    def execute(self, args, tmpdir):
-        import pip
-
-        install_dir = tempfile.mkdtemp()
-        execute_cmd(["git", "clone", "--depth=1", args.origin, install_dir])
-        pwd = os.getcwd()
-        try:
-            os.chdir(install_dir)
-            if args.user:
-                log_debug("Installing for current user")
-            else:
-                log_debug("Installing system wide")
-                
-            f = open("_install.py","w+")
-            f.write("\n".join(
-                [ 'from time import sleep'
-                , 'import shutil, stat, os, subprocess, sys'
-                , 'from colorama import init, Fore, Style'
-                , 'init(autoreset=True)'
-                , 'def purge_dir(dir_path):'
-                , '    if os.path.isdir(dir_path):'
-                , '        def del_evenReadonly(action, name, exc):'
-                , '            os.chmod(name, stat.S_IWRITE)'
-                , '            os.remove(name)'
-                , '        shutil.rmtree(dir_path, onerror=del_evenReadonly)'
-                , 'sleep(1)'
-                , 'pwd = os.getcwd()'
-                , 'try:'
-                , '    install_args = ["python3" if shutil.which("python3") else "python", "setup.py", "install"]' + (' + ["--user"]' if args.user else '')
-                , '    subprocess.check_call(install_args)'
-                , '    print(Fore.GREEN + "Upgrade successful! Enjoy!")'
-                , 'except Exception as err:'
-                , '    print(Fore.RED + "Upgrade failed! Check the log for more info..." + err, file=sys.stderr)'
-                , 'finally:'
-                , '    os.chdir("..")'
-                , '    purge_dir(pwd)']))
-            f.close()
-            p = subprocess.Popen(['python', '_install.py'])
-            log_warn("Install process started, please wait for it to finish!")
-        finally:
-            os.chdir(pwd)
-
 def main_tool(argv=None, description=__description__, version=__version__, copyright=__copyright__, author=__author__,
               origin=None):
     global tool_origin
