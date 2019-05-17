@@ -12,6 +12,7 @@ import stat
 import time
 import subprocess
 import uuid
+import mmap
 from shlex import quote
 from distutils.version import StrictVersion
 from git import Repo, Head
@@ -128,7 +129,7 @@ def ignore_exception(ignored_exceptions=(Exception), default_value=None, silent=
         def _dec(*args, **kwargs):
             try:
                 return function(*args, **kwargs)
-            except ignored_exceptions:
+            except ignored_exceptions as e:
                 if not silent:
                     print_safe(e)
                 return default_value
@@ -554,6 +555,16 @@ def read_from_file(file_path):
 
 def to_unix_path(path):
     return os.path.normpath(path).replace(os.sep, "/")
+
+def to_module_path(path):
+    return os.path.splitext(to_unix_path(path))[0].replace("/", ".")
+    
+def file_contains(path, pattern):
+    with open(path, 'rb', 0) as file, \
+        mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ) as s:
+            if s.find(pattern) != -1:
+                return True
+    return False
 
 
 # ----------------------------------------------------------------------------------------

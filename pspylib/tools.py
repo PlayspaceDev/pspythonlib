@@ -5,7 +5,6 @@ import inspect
 import argcomplete
 import tempfile
 import subprocess
-from setuptools import find_packages
 
 from pspylib.common import *
 
@@ -33,17 +32,25 @@ def get_available_tools():
     global registered_tools
     return list(registered_tools.keys())
 
-def find_tools():
-    packages = find_packages()
+def find_tools(root):
+    root_package = os.path.basename(root)
+    packages = []
+    for dirname, _, filenames in os.walk(root):
+        if '__init__.py' in filenames:
+            for package in filenames:
+                if '__init__.py' != package:
+                    file_path = os.path.join(dirname, package)
+                    if file_contains(file_path, b'register_tool'):
+                        packages.append('.'.join([root_package, to_module_path(os.path.relpath(file_path, root))]))
     for package in packages:
         try:
-            __import__(package + ".tool")
-        except ModuleNotFoundError:
-            # Not a tool
+            __import__(package)
+        except Exception as e:
+            log_error("Failed to load tool '{0}' due to: '{1}' ", package, e)
             pass
 
-def init_tools(parser, tmpdir):
-    find_tools()
+def init_tools(root, parser, tmpdir):
+    find_tools(root)
     for tool_name in registered_tools:
         tool_parser = parser.add_parser(tool_name, help=registered_tools[tool_name]['help'])
         try:
@@ -78,8 +85,7 @@ def register_tool(name=None, help=None):
 
     return toolify
 
-def main_tool(argv=None, description=__description__, version=__version__, copyright=__copyright__, author=__author__,
-              origin=None):
+def main_tool(root, argv=None, description=__description__, version=__version__, copyright=__copyright__, author=__author__, origin=None):
     global tool_origin
     tool_origin = origin
 
@@ -106,7 +112,7 @@ def main_tool(argv=None, description=__description__, version=__version__, copyr
             # Add first parser in the nested tree
             subparser = parser.add_subparsers(dest='tool', help='Available tools')
             subparser.required = True
-            init_tools(subparser, tmpdir)
+            init_tools(root, subparser, tmpdir)
             argcomplete.autocomplete(parser)
 
             if '--interactive' in argv:
