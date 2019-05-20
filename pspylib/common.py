@@ -414,7 +414,11 @@ def git_get_remote(repo, remote_name):
 
 
 def git_has_remote_branch(repo, branch_name):
-    return 'refs/heads/{}'.format(branch_name) in repo.git.ls_remote('--heads')
+    heads = repo.git.ls_remote('--heads')
+    for head in heads:
+        if head == 'refs/heads/{}'.format(branch_name):
+            return True
+    return False
 
 
 def git_has_local_branch(repo, branch_name):
